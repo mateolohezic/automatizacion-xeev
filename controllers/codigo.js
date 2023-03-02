@@ -1,20 +1,18 @@
 const puppeteer = require('puppeteer');
 
-// const lineId = '827635';
-// const codeValue = '4B44D260';
-
-const cargarCodigo =  async (req, res) => {
-
+const cargarCodigo = async (req, res) => {
   const { lineId, codeValue } = req.body;
-  const playlistTitle = 'Mateo es un capo';
-
+  const playlistTitle = 'XPLAY - Lider En Latinoamerica de Series y Peliculas';
+  const userEmail = 'carlosguindan@yahoo.com.ar'
+  const userPassword = 'sapocapo2332'
+  
   try {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
       args: [
         '--disable-notifications',
-        '--disable-gpu'
+        '--disable-gpu',
       ],
     });
   
@@ -22,87 +20,100 @@ const cargarCodigo =  async (req, res) => {
     
     // Go to login page
     await page.goto('https://xeev.net/en/login');
-  
-    // Fill in login details and submit
-    await page.waitForSelector('#username');
-    await page.type('#username', 'mateolohezic');
-    await page.type('#password', 'residentevil');
-    await page.evaluate(() => {
-      document.querySelector('form').submit();
-    });
-  
-    // Wait for navigation and go to target page
+
+    // Wait for the email input field to appear on the page
+    await page.waitForSelector('input[name="email"]');
+    
+    // Fill email and password inputs
+    for (let i = 0; i < userEmail.length; i++) {
+      await page.type('input[name="email"]', userEmail.charAt(i));
+      await page.waitForTimeout(100); // wait 100ms between each letter
+
+    }
+
+    for (let i = 0; i < userPassword.length; i++) {
+      await page.type('input[name="password"]', userPassword.charAt(i));
+      await page.waitForTimeout(100); // wait 100ms between each letter
+
+    }
+
+
+    // Click on the login button and wait for the page to load
+    await page.click('button[type="submit"]');
+    
     await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    await page.goto(`https://xeev.net/en/pro/line/edit/${lineId}`);
+    console.log('Successfully logged in!');
+    
+    await page.goto(`https://xeev.net/en/app/playlist_line/edit/${lineId}`);
     console.log('Successfully navigated to the edit page!');
-  
-    // Fill in the input field with code
-    await page.waitForSelector('.form-control.addcodeinput');
-    await page.type('.form-control.addcodeinput', codeValue);
-    console.log('Code entered successfully!');
-  
-    // Click the button to send the code
-    await page.waitForSelector('button[alt="New APP Code"]');
-    await page.click('button[alt="New APP Code"]');
-    console.log('Code sent successfully!');
-  
-    await page.waitForTimeout(1500);
-    // Click the save button
-    await page.click('#savebtn');
-    console.log('Save button clicked successfully!');
+      
+    // Wait for the APP-Code input field to appear
+    await page.waitForSelector('input[placeholder="APP-Code"]');
 
-    await page.waitForSelector('a[href="#appdev2"]');
-    await page.click('a[href="#appdev2"]');
-    console.log('Target link clicked successfully!');
+    // Fill in the APP-Code input field letter by letter
+    for (let i = 0; i < codeValue.length; i++) {
+      await page.type('input[placeholder="APP-Code"]', codeValue.charAt(i));
+    }
+    await page.waitForTimeout(2000);
+    // Click the button with class="btn btn-success"
+    await page.click('button.btn.btn-success');
+    console.log('Successfully filled in the APP-Code input field and clicked the button!');
 
-    // Wait for the input field to appear and fill with codeValue
-    await page.waitForSelector('#table_search');
-    await page.type('#table_search', codeValue);
+    await page.waitForTimeout(1000);
 
-    // Submit the form
-    await page.waitForSelector('#app2LinesForm');
-    await page.evaluate(() => {
-      document.querySelector('#app2LinesForm').submit();
-    });
-    console.log('Form submitted successfully!');
+    // Navigate to the edit page
+    await page.goto(`https://xeev.net/en/app/playlist_dev_x3m/edit/${codeValue}`);
 
-    await page.waitForTimeout(1500);
-    // Wait for search results to load
-    await page.waitForSelector('.table.table-striped.table-condensed');
+    // Wait for the checkbox to load and click it
+    await page.waitForSelector('input[name="playlist_device2[update_settings]"]');
+    await page.click('input[name="playlist_device2[update_settings]"]');
 
-    // Find the <a> tag with the gear icon
-    const gearLink = await page.$('a:has(i.fa.fa-gear.fa-fw)');
+    // Wait for the playlist title input field to appear on the page
+    await page.waitForSelector('input[id="playlist_device2_settings_playlist_title"]');
+    
+    // Fill the playlist title input field letter by letter
+    for (let i = 0; i < playlistTitle.length; i++) {
+      await page.type('input[id="playlist_device2_settings_playlist_title"]', playlistTitle.charAt(i));
+    }
 
-    // Click on the gear icon link
-    await gearLink.click();
-    console.log('Clicked on gear icon link successfully!');
+    // Select the "Low" option from the network caching series dropdown
+    await page.select('select[id="playlist_device2_settings_network_caching_series"]', '0');
 
-    await page.waitForSelector('#app_code_update_settings');
-    await page.click('#app_code_update_settings');
+    // Wait for half a second
+    await page.waitForTimeout(500);
 
-    // Fill in the playlist title input
-    await page.waitForSelector('#app_code_pluginInfo_playlist_title');
-    await page.type('#app_code_pluginInfo_playlist_title', playlistTitle);
-    console.log('Playlist title entered successfully!');
+    // Click on the form submit button
+    await page.click('#form_submit_button');
+    await page.waitForNavigation({ waitUntil: 'networkidle2' });
+    await page.waitForTimeout(500);
 
-    // Select dropdown menu and option value
-    await page.select('#app_code_pluginInfo_network_caching_series', '0');
+    // Click on the logout button
+    await page.waitForSelector('#__BVID__20__BV_toggle_');
+    await page.click('#__BVID__20__BV_toggle_');
 
-    await page.waitForTimeout(1500);
-    // Click the save button
-    await page.click('#savebtn');
-    console.log('Save button clicked successfully!');
+    await page.waitForTimeout(500);
 
-    // Logout
-    await page.goto('https://xeev.net/en/logout');
-
+    // Click on the logout link
+    await page.click('.dropdown-item.text-danger');
+    console.log('Finished!');
     // Close the browser when finished
     await browser.close();
 
     res.status(200).json({ message: 'Script executed successfully' });
   } catch (error) {
+    console.error('Captcha!');
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { cargarCodigo }
+module.exports = { cargarCodigo };
+
+
+// lineid = 5024
+// codeValue = 66617011
+
+// 66617011
+// C3AB54BB
+// FCF5643C
+// 07CD4E2C
+// 166464D0
