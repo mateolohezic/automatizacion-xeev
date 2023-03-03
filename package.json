@@ -1,4 +1,23 @@
 {
+  "name": "proyectofinalback",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mateolohezic/automatizacion-xeev.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mateolohezic/automatizacion-xeev.git/issues"
+  },
+  "homepage": "https://github.com/mateolohezic/automatizacion-xeev.git#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "cors-anywhere": "^0.4.4",
