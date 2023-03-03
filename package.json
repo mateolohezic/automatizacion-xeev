@@ -2,7 +2,7 @@
   "name": "proyectofinalback",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app"
@@ -23,6 +23,7 @@
     "cors-anywhere": "^0.4.4",
     "express": "^4.18.2",
     "mongoose": "^6.10.0",
+    "nodemon": "^2.0.21",
     "puppeteer": "^19.7.2"
   }
 }
