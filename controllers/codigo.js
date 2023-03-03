@@ -7,7 +7,6 @@ const cargarCodigo = async (req, res) => {
   // const userPassword = 'sapocapo2332'
   
   try {
-    console.log('Successfully navigated to the edit page!');
     // const browser = await puppeteer.launch({
     //   headless: false,
     //   defaultViewport: null,
