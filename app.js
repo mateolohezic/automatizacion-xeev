@@ -10,7 +10,7 @@ require('./database/db');
 const codigo = require('./routes/codigo');
 const users = require('./routes/users');
 
-app.use('/', codigo);
+app.use('/codigo', codigo);
 app.use('/users', users);
 
 app.listen(port, () =>  {
