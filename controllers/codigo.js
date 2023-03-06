@@ -7,14 +7,14 @@ const cargarCodigo = async (req, res) => {
   const userPassword = 'sapocapo2332'
   
   try {
-    // const browser = await puppeteer.launch({
-    //   headless: false,
-    //   defaultViewport: null,
-    //   args: [
-    //     '--disable-notifications',
-    //     '--disable-gpu',
-    //   ],
-    // });
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+      args: [
+        '--disable-notifications',
+        '--disable-gpu',
+      ],
+    });
   
     // const page = await browser.newPage();
     
