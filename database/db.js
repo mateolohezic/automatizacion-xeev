@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', true);
 
-const dBUrl = 'mongodb+srv://mateolohezic:residentevil@xeev.dz8q0oq.mongodb.net/?retryWrites=true&w=majority';
+const dBUrl = process.env.URL;
 const connectDB = async () => {
   try {
     await mongoose.connect(dBUrl);
