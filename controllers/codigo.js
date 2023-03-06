@@ -8,12 +8,15 @@ const cargarCodigo = async (req, res) => {
   
   try {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       defaultViewport: null,
       args: [
         '--disable-notifications',
         '--disable-gpu',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
       ],
+      ignoreDefaultArgs: ['--disable-extensions']
     });
   
     // const page = await browser.newPage();
@@ -96,8 +99,8 @@ const cargarCodigo = async (req, res) => {
     // // Click on the logout link
     // await page.click('.dropdown-item.text-danger');
     // console.log('Finished!');
-    // // Close the browser when finished
-    // await browser.close();
+    // Close the browser when finished
+    await browser.close();
 
     res.status(200).json({ message: 'Script executed successfully' });
   } catch (error) {
