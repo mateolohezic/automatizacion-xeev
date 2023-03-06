@@ -7,19 +7,19 @@ const cargarCodigo = async (req, res) => {
   const userPassword = 'sapocapo2332'
   
   try {
-    const browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-      args: [
-        '--disable-notifications',
-        '--disable-gpu',
-      ],
-    });
+    // const browser = await puppeteer.launch({
+    //   headless: false,
+    //   defaultViewport: null,
+    //   args: [
+    //     '--disable-notifications',
+    //     '--disable-gpu',
+    //   ],
+    // });
   
-    const page = await browser.newPage();
+    // const page = await browser.newPage();
     
-    // Go to login page
-    await page.goto('https://xeev.net/en/login');
+    // // Go to login page
+    // await page.goto('https://xeev.net/en/login');
 
     // // Wait for the email input field to appear on the page
     // await page.waitForSelector('input[name="email"]');
