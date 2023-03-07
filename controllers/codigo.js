@@ -19,10 +19,10 @@ const cargarCodigo = async (req, res) => {
       ignoreDefaultArgs: ['--disable-extensions']
     });
   
-    // const page = await browser.newPage();
+    const page = await browser.newPage();
     
-    // // Go to login page
-    // await page.goto('https://xeev.net/en/login');
+    // Go to login page
+    await page.goto('https://xeev.net/en/login');
 
     // // Wait for the email input field to appear on the page
     // await page.waitForSelector('input[name="email"]');
