@@ -23,30 +23,29 @@ const cargarCodigo = async (req, res) => {
     
     // Go to login page
     await page.goto('https://xeev.net/en/login');
+
+    // Wait for the email input field to appear on the page
+    await page.waitForSelector('input[name="email"]');
+    
+    // Fill email and password inputs
+    for (let i = 0; i < userEmail.length; i++) {
+      await page.type('input[name="email"]', userEmail.charAt(i));
+      await page.waitForTimeout(100); // wait 100ms between each letter
+
+    }
+
+    for (let i = 0; i < userPassword.length; i++) {
+      await page.type('input[name="password"]', userPassword.charAt(i));
+      await page.waitForTimeout(100); // wait 100ms between each letter
+
+    }
+
+
+    // Click on the login button and wait for the page to load
+    await page.click('button[type="submit"]');
+    
+    await page.waitForNavigation({ waitUntil: 'networkidle2' });
     console.log('Successfully logged in!');
-
-    // // Wait for the email input field to appear on the page
-    // await page.waitForSelector('input[name="email"]');
-    
-    // // Fill email and password inputs
-    // for (let i = 0; i < userEmail.length; i++) {
-    //   await page.type('input[name="email"]', userEmail.charAt(i));
-    //   await page.waitForTimeout(100); // wait 100ms between each letter
-
-    // }
-
-    // for (let i = 0; i < userPassword.length; i++) {
-    //   await page.type('input[name="password"]', userPassword.charAt(i));
-    //   await page.waitForTimeout(100); // wait 100ms between each letter
-
-    // }
-
-
-    // // Click on the login button and wait for the page to load
-    // await page.click('button[type="submit"]');
-    
-    // await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    // console.log('Successfully logged in!');
     
     // await page.goto(`https://xeev.net/en/app/playlist_line/edit/${lineId}`);
     // console.log('Successfully navigated to the edit page!');
