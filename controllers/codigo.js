@@ -23,6 +23,7 @@ const cargarCodigo = async (req, res) => {
     
     // Go to login page
     await page.goto('https://xeev.net/en/login');
+    console.log('Successfully logged in!');
 
     // // Wait for the email input field to appear on the page
     // await page.waitForSelector('input[name="email"]');
