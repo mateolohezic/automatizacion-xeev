@@ -18,7 +18,7 @@ const cargarCodigo = async (req, res) => {
         '--disable-web-security',
         '--disable-features=IsolateOrigins',
         '--disable-site-isolation-trials'
-      ],
+      ],  
       ignoreDefaultArgs: ['--disable-extensions']
     });
   
@@ -30,22 +30,22 @@ const cargarCodigo = async (req, res) => {
     // Wait for the email input field to appear on the page
     await page.waitForSelector('input[name="email"]');
 
-    // // Set a value in local storage
-    // await page.evaluate(() => {
-    //   localStorage.setItem('_grecaptcha', '09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84');
-    // });
+    // Set a value in local storage
+    await page.evaluate(() => {
+      localStorage.setItem('_grecaptcha', '09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84');
+    });
 
-    // // Fill email and password inputs
-    // for (let i = 0; i < userEmail.length; i++) {
-    //   await page.type('input[name="email"]', userEmail.charAt(i));
-    //   await page.waitForTimeout(100);
+    // Fill email and password inputs
+    for (let i = 0; i < userEmail.length; i++) {
+      await page.type('input[name="email"]', userEmail.charAt(i));
+      await page.waitForTimeout(100);
 
-    // }
+    }
 
-    // for (let i = 0; i < userPassword.length; i++) {
-    //   await page.type('input[name="password"]', userPassword.charAt(i));
-    //   await page.waitForTimeout(100);
-    // }
+    for (let i = 0; i < userPassword.length; i++) {
+      await page.type('input[name="password"]', userPassword.charAt(i));
+      await page.waitForTimeout(100);
+    }
 
     // // Click on the login button and wait for the page to load
     // await page.click('button[type="submit"]');
