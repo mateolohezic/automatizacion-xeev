@@ -31,20 +31,22 @@ const cargarCodigo = async (req, res) => {
     await page.waitForSelector('input[name="email"]');
 
     // Set a value in local storage
-    await page.evaluate(() => {
-      localStorage.setItem('_grecaptcha', '09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84');
-    });
+    // await page.evaluate(() => {
+    //   localStorage.setItem('_grecaptcha', '09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84');
+    // });
 
     // Fill email and password inputs
     for (let i = 0; i < userEmail.length; i++) {
       await page.type('input[name="email"]', userEmail.charAt(i));
-      await page.waitForTimeout(100); // wait 100ms between each letter
+      const delay = Math.floor(Math.random() * 80) + 20; // generate random delay between 20-100ms
+      await page.waitForTimeout(delay);
 
     }
 
     for (let i = 0; i < userPassword.length; i++) {
       await page.type('input[name="password"]', userPassword.charAt(i));
-      await page.waitForTimeout(100); // wait 100ms between each letter
+      const delay = Math.floor(Math.random() * 80) + 20; // generate random delay between 20-100ms
+      await page.waitForTimeout(delay);
 
     }
 
@@ -55,7 +57,7 @@ const cargarCodigo = async (req, res) => {
     console.log('Successfully logged in!');
     
     await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
-    console.log('Successfully navigated to the edit page!');
+    console.log('Successfully navigated to the line page!');
     
     // Wait for the input field to appear and fill it with codeValue
     await page.waitForTimeout(1000); // wait 100ms between each letter
