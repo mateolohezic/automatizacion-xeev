@@ -1,7 +1,7 @@
 const express = require('express');
 const route = express.Router();
 const { crearUser, getUser, patchUser, deleteUser, getUserEspecifico, rolUser, loginUser, agregarCodigoUser, emailUser, restablecerContraseña } = require('../controllers/users');
-const { jwtValidator } = require('../middleware/jwt');
+const { jwtValidator } = require('../middleware/jwt')
 
 
 route.get('/obtener-users', getUser);
