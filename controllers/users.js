@@ -76,10 +76,10 @@ const agregarCodigoUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const { username, password } = req.body
+    const { email, password } = req.body
 
     try{
-        const user = await User.findOne({"username": username})
+        const user = await User.findOne({"email": email})
         if (user) {
             if (bcrypt.compareSync(password, user.password)) {
                 const token = jwt.sign({user}, claveToken , { expiresIn : "1h"})
@@ -89,7 +89,7 @@ const loginUser = async (req, res) => {
                 res.status(206).send({message : 'Contraseña incorrecta'})
               }
             } else {
-              res.status(206).send({message : 'Usuario no encontrado'})
+              res.status(206).send({message : 'E-mail no encontrado'})
         }
     }
     catch(error){
