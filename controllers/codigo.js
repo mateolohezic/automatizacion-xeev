@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const cargarCodigo = async (req, res) => {
   const { lineId, codeValue } = req.body;
-  const playlistTitle = 'XPLAY - Lider En Latinoamerica de Series y Peliculas';
+  const playlistTitle = 'XPLAY - Liderr En Latinoamerica de Series y Peliculas';
   const userEmail = 'carlosguindan@yahoo.com.ar'
   const userPassword = 'sapocapo2332'
   
