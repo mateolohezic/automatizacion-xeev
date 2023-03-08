@@ -50,22 +50,23 @@ const cargarCodigo = async (req, res) => {
     // // Click on the login button and wait for the page to load
     await page.click('button[type="submit"]');
     
-    // await page.waitForNavigation({ waitUntil: 'networkidle2' });
     console.log('Successfully logged in!');
-
     
-    // await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
-    // console.log('Successfully navigated to the line page!');
+    await page.waitForTimeout(1000);
+    
+    
+    await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
+    console.log('Successfully navigated to the line page!');
     
     // // Wait for the input field to appear and fill it with codeValue
-    // await page.waitForSelector('input.form-control[type="text"][placeholder="App-Code"]');
-    // await page.type('input.form-control[type="text"][placeholder="App-Code"]', codeValue);
+    await page.waitForSelector('input.form-control[type="text"][placeholder="App-Code"]');
+    await page.type('input.form-control[type="text"][placeholder="App-Code"]', codeValue);
     
     // // Click the button with class="btn btn-success"
-    // await page.click('button.btn.btn-success');
-    // console.log('Successfully filled in the APP-Code input field and clicked the button!');
+    await page.click('button.btn.btn-success');
+    console.log('Successfully filled in the APP-Code input field and clicked the button!');
 
-    // await page.waitForTimeout(1000);
+    await page.waitForTimeout(1000);
 
     // // Navigate to the edit page
     // await page.goto(`https://xeev.net/en/app/dev_x3m/edit/${codeValue}`);
