@@ -48,10 +48,10 @@ const cargarCodigo = async (req, res) => {
     }
 
     // // Click on the login button and wait for the page to load
-    // await page.click('button[type="submit"]');
+    await page.click('button[type="submit"]');
     
     // await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    // console.log('Successfully logged in!');
+    console.log('Successfully logged in!');
 
     
     // await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
