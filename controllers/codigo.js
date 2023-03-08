@@ -31,9 +31,9 @@ const cargarCodigo = async (req, res) => {
     await page.waitForSelector('input[name="email"]');
 
     // Set a value in local storage
-    // await page.evaluate(() => {
-    //   localStorage.setItem('_grecaptcha', '09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84');
-    // });
+    await page.evaluate(() => {
+      localStorage.setItem('_grecaptcha', '09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84');
+    });
 
     // Fill email and password inputs
     for (let i = 0; i < userEmail.length; i++) {
@@ -55,13 +55,12 @@ const cargarCodigo = async (req, res) => {
     
     await page.waitForNavigation({ waitUntil: 'networkidle2' });
     console.log('Successfully logged in!');
+
     
     await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
     console.log('Successfully navigated to the line page!');
     
     // Wait for the input field to appear and fill it with codeValue
-    await page.waitForTimeout(1000); // wait 100ms between each letter
-
     await page.waitForSelector('input.form-control[type="text"][placeholder="App-Code"]');
     await page.type('input.form-control[type="text"][placeholder="App-Code"]', codeValue);
     
