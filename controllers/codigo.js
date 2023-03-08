@@ -56,10 +56,10 @@ const cargarCodigo = async (req, res) => {
     
     
     await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
-    console.log('Successfully navigated to the line page!');
     
     // // Wait for the input field to appear and fill it with codeValue
     await page.waitForSelector('input.form-control[type="text"][placeholder="App-Code"]');
+    console.log('Successfully navigated to the line page!');
     await page.type('input.form-control[type="text"][placeholder="App-Code"]', codeValue);
     
     // // Click the button with class="btn btn-success"
