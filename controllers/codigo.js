@@ -56,10 +56,10 @@ const cargarCodigo = async (req, res) => {
     
     
     await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
+    console.log('Successfully navigated to the line page!');
     
     // // Wait for the input field to appear and fill it with codeValue
     await page.waitForSelector('input.form-control[type="text"][placeholder="App-Code"]');
-    console.log('Successfully navigated to the line page!');
     await page.type('input.form-control[type="text"][placeholder="App-Code"]', codeValue);
     
     // // Click the button with class="btn btn-success"
@@ -69,28 +69,28 @@ const cargarCodigo = async (req, res) => {
     await page.waitForTimeout(1000);
 
     // // Navigate to the edit page
-    // await page.goto(`https://xeev.net/en/app/dev_x3m/edit/${codeValue}`);
-    // console.log('Successfully navigated to the edit page!');
+    await page.goto(`https://xeev.net/en/app/dev_x3m/edit/${codeValue}`);
+    console.log('Successfully navigated to the edit page!');
 
     // // Wait for the checkbox to load and click it
-    // await page.waitForSelector('input[name="app_code2[update_settings]"]');
-    // await page.click('input[name="app_code2[update_settings]"]');
+    await page.waitForSelector('input[name="app_code2[update_settings]"]');
+    await page.click('input[name="app_code2[update_settings]"]');
 
     // // Wait for the playlist title input field to appear on the page
-    // await page.waitForSelector('input[id="app_code2_pluginInfo_playlist_title"]');
+    await page.waitForSelector('input[id="app_code2_pluginInfo_playlist_title"]');
     
     // // Fill the playlist title input field letter by letter
-    // await page.type('input[id="app_code2_pluginInfo_playlist_title"]', playlistTitle);
+    await page.type('input[id="app_code2_pluginInfo_playlist_title"]', playlistTitle);
 
     // // Select the "Low" option from the network caching series dropdown
-    // await page.select('select[id="app_code2_pluginInfo_network_caching_series"]', '0');
+    await page.select('select[id="app_code2_pluginInfo_network_caching_series"]', '0');
 
     // // Wait for half a second
-    // await page.waitForTimeout(500);
+    await page.waitForTimeout(500);
 
     // // Click on the form submit button
-    // await page.click('#form_submit_button');
-    // await page.waitForTimeout(1000);
+    await page.click('#form_submit_button');
+    await page.waitForTimeout(1000);
 
     console.log('Finished!');
 
