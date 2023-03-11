@@ -71,11 +71,11 @@ const renewDateCode = async (req, res) => {
     await Code.findByIdAndUpdate(id, {
         expire: expire.toLocaleDateString('es-ES'),
     })
-    res.status(200).send(`Se renovó el código con éxito.`)
+    res.status(200).send(`Se renovó el vencimiento del código con éxito.`)
 };
 
 const banCode = async (req, res) => {
-    const {idXeev, id} = req.body
+    const {id} = req.body
     const status = 'desactivado'
     await Code.findByIdAndUpdate(id, {
         status
@@ -270,7 +270,10 @@ const editData = async (codigo, tokenValue) => {
     }
 };
 
+let vecesReavivado = 0;
+
 const keepAlive = async () => {
+    vecesReavivado = vecesReavivado + 1;
     const data = {
       action: 'get_x3m_dev',
       page: 1,
@@ -305,12 +308,13 @@ const keepAlive = async () => {
         data,
         options
       );
-      console.log('Reavivado');
+      console.log(`Reavivado ${vecesReavivado}`);
     } catch (error) {
       console.log(error.message);
     }
   };
   keepAlive();
+
   setInterval(() => {
     keepAlive();
   }, 120 * 1000);
