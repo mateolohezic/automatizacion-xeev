@@ -313,6 +313,6 @@ const keepAlive = async () => {
   keepAlive();
   setInterval(() => {
     keepAlive();
-  }, 30 * 1000);
+  }, 120 * 1000);
 
 module.exports = { postData, getCodes, getCodeEspecifico, borrarCodePermanente, patchCode, renewCode, banCode, renewDateCode, deleteCode };
