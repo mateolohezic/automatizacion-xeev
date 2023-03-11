@@ -31,8 +31,7 @@ const crearUser = async (req, res) => {
         surname,
         email,
         password: passwordEncripted,
-        rol,
-        costumers: []
+        rol
     })
     await nuevoUser.save()
     res.status(200).send(`Se creo el usuario con éxito.`)
@@ -63,14 +62,6 @@ const rolUser = async (req, res) => {
     const { id, rol  } = req.body
     await User.findByIdAndUpdate(id, {
         rol
-    })
-    res.status(200).send(`Se actualizo el usuario con éxito.`)
-};
-
-const agregarCodigoUser = async (req, res) => {
-    const { id, costumers  } = req.body
-    await User.findByIdAndUpdate(id, {
-        costumers
     })
     res.status(200).send(`Se actualizo el usuario con éxito.`)
 };
@@ -125,4 +116,4 @@ const restablecerContraseña = async (req, res) => {
     res.status(200).send(`Se actualizo la contraseña con éxito.`)
 };
 
-module.exports = { crearUser, getUser, deleteUser, patchUser, getUserEspecifico, rolUser, loginUser, agregarCodigoUser, emailUser, restablecerContraseña }
+module.exports = { crearUser, getUser, deleteUser, patchUser, getUserEspecifico, rolUser, loginUser, emailUser, restablecerContraseña }

@@ -9,7 +9,6 @@ route.get('/:id', getUserEspecifico);
 route.post('/crear-user', crearUser)
 route.patch(`/editar-user`, patchUser);
 route.patch(`/estado-user`, jwtValidator, rolUser);
-route.patch(`/agregar-codigo`, agregarCodigoUser);
 route.delete(`/eliminar-user`, jwtValidator, deleteUser);
 route.post(`/login-user`, loginUser);
 route.patch(`/restablecer-password`, restablecerContraseña);

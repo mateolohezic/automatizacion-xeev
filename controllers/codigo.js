@@ -1,242 +1,318 @@
-const puppeteer = require('puppeteer-extra')
-const Client = require('@infosimples/node_two_captcha');
-const Captcha = require("2captcha")
-const RecaptchaPlugin = require('puppeteer-extra-plugin-recaptcha')
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-const request = require('request');
-const timers = require('timers-promises')
+const Code = require('../model/codigo');
+const axios = require('axios');
+const FormData = require('form-data');
 
-let codigoCaptcha = null;
-
-puppeteer.use(StealthPlugin())
-
-puppeteer.use(
-  RecaptchaPlugin({
-    provider: {
-      id: '2captcha',
-      token: 'aab9de09fc40871f013970b848ab8354' // REPLACE THIS WITH YOUR OWN 2CAPTCHA API KEY ⚡
-    },
-    visualFeedback: false, // colorize reCAPTCHAs (violet = detected, green = solved)
-    solveScoreBased: true,
-    solveInactiveChallenges:true
-  })
-)
-
-const Enviar = async () => {
-  try {
-
-    await request.post(
-      'http://2captcha.com/in.php',
-      { json: { 
-        method: 'userrecaptcha',
-        key: 'aab9de09fc40871f013970b848ab8354',
-        version: 'v3',
-        min_score: 0.4,
-        googlekey: '6Les5LsUAAAAAHETMg3GsVl0FllXMr366eCb66mK',
-        pageurl: 'https://xeev.net/en/login',
-        action: 'login',
-        json: 1
-      } },
-      async function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          console.log(body);
-          await timers.setTimeout(20000)
-          await Recibir(body.request)
-        }
-      }
-    );
-  } catch (error) {
-    console.log(error);
-  }
-  }
-
-const Recibir = async (idRecibido) => {
-  try {
-    await request.get(
-      `http://2captcha.com/res.php?key=aab9de09fc40871f013970b848ab8354&action=get&json=1&id=${idRecibido}`,
-      async function (error, response, body) {
-          if (!error && response.statusCode == 200) {
-            body = JSON.parse(body);
-            console.log(body);
-            codigoCaptcha = body.request;
-        }
-      }
-    );
-  } catch (error) {
-    console.log(error);
-  }
+const getCodes = async (req, res) => {
+    try {
+        const codes = await Code.find({})
+        res.status(200).send(codes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
-// A new 'solver' instance with our API key
-const solver = new Captcha.Solver('aab9de09fc40871f013970b848ab8354')
+const getCodeEspecifico = async (req, res) => {
+    const { id } = req.params;
+    const code = await Code.findById(id)
+    res.status(200).send(code);
+}
 
-// Declare your client
-client = new Client('aab9de09fc40871f013970b848ab8354', {
-  timeout: 60000,
-  polling: 5000,
-  throwErrors: false});
+const crearCode = async ( idXeev, code, name, number, seller ) => {
+    const date = new Date();
+    const expire = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    const status = 'activo'
+    const nuevoCode = new Code({
+        idXeev,
+        code,
+        name,
+        number,
+        seller,
+        date: date.toLocaleDateString('es-ES'),
+        expire: expire.toLocaleDateString('es-ES'),
+        status
+    })
+    await nuevoCode.save()
+    console.log('Codigo cargado a la base de datos con exito');
+}
 
-const playlistTitle = 'XPLAY - Lider En Latinoamerica de Series y Peliculas';
-const userEmail = 'carlosguindan@yahoo.com.ar'
-const userPassword = 'sapocapo2332'
-const apiKey = 'aab9de09fc40871f013970b848ab8354';
-const siteKey = '6Les5LsUAAAAAHETMg3GsVl0FllXMr366eCb66mK';
+const borrarCodePermanente = async (req, res) => {
+    const { idXeev, id } = req.body
+    await deleteCode( idXeev )
+    await Code.findByIdAndDelete(id);
+    res.status(200).send(`Se elimino el código con éxito.`)
+}
 
-const cargarCodigo = async (req, res) => {
-  const { lineId, codeValue } = req.body;
-  
-  try {
-    const browser = await puppeteer.launch({
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-      headless: false,
-      defaultViewport: null,
-      args: [
-        '--disable-notifications',
-        '--disable-gpu',
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-web-security',
-        '--disable-features=IsolateOrigins',
-        '--disable-site-isolation-trials',
-        '--site-per-process,SitePerProcess',
-        '--flag-switches-begin',
-        '--disable-site-isolation-trials',
-        '--flag-switches-end'
-      ],  
-      ignoreDefaultArgs: ['--disable-extensions']
-    });
-  
-    const page = await browser.newPage();
-    
-    // Go to login page
-    await page.goto('https://xeev.net/en/login');
-
-    // Wait for the email input field to appear on the page
-    await page.waitForSelector('button[type="submit"]');
-
-    // Fill email and password inputs
-    for (let i = 0; i < userEmail.length; i++) {
-      await page.type('input[name="email"]', userEmail.charAt(i));
-      await page.waitForTimeout(100);
-
-    }
-
-    for (let i = 0; i < userPassword.length; i++) {
-      await page.type('input[name="password"]', userPassword.charAt(i));
-      await page.waitForTimeout(100);
-    }
-
-    // Loop over all potential frames on that page
-    // for (const frame of page.mainFrame().childFrames()) {
-    //   // Attempt to solve any potential captchas in those frames
-    //   await frame.solveRecaptchas()
-    // }
-
-    
-    // let { captchas, filtered, error } = await page.findRecaptchas()
-    // console.log(captchas, filtered, error);
-    // let { solutions, errors } = await page.getRecaptchaSolutions(captchas)
-    // console.log(errors);
-    // console.log('Soluciones:');
-    // console.log(solutions);
-    // let { solved, errorss } = await page.enterRecaptchaSolutions(solutions)
-    // console.log(errorss);
-    // console.log('Solucionado:');
-    // console.log(solved);
-        
-    // await client.decodeRecaptchaV3({
-    //   googlekey: '6Les5LsUAAAAAHETMg3GsVl0FllXMr366eCb66mK',
-    //   pageurl: 'https://xeev.net/en/login',
-    //   action: 'login'
-    // }).then(async function(response) {
-    //   captchaCode = response.text
-    // });
-      
-    // console.log(captchaCode);
-    
-    // Click on the login button
-    // await page.click('button[type="submit"]')
-      
-    await Enviar()
-    
-    await page.waitForTimeout(25000);
-
-    console.log(codigoCaptcha);
-
-    const recaptchaTokenInput = await page.$('#recaptcha-token');
-    await page.evaluate((input) => {
-      input.value = 'HOALHOLAHOLA';
-    }, recaptchaTokenInput);
-
-    console.log('Successfully logged in!');
-    
-    // await page.goto(`https://xeev.net/en/app/lines/edit/${lineId}`);
-    // console.log('Successfully navigated to the line page!');
-    
-    // // Wait for the input field to appear and fill it with codeValue
-    // await page.waitForSelector('input.form-control[type="text"][placeholder="App-Code"]');
-    // await page.type('input.form-control[type="text"][placeholder="App-Code"]', codeValue);
-    
-    // // Click the button with class="btn btn-success"
-    // await page.click('button.btn.btn-success');
-    // console.log('Successfully filled in the APP-Code input field and clicked the button!');
-
-    // await page.waitForTimeout(1000);
-
-    // // Navigate to the edit page
-    // await page.goto(`https://xeev.net/en/app/dev_x3m/edit/${codeValue}`);
-    // console.log('Successfully navigated to the edit page!');
-
-    // // Wait for the checkbox to load and click it
-    // await page.waitForSelector('input[name="app_code2[update_settings]"]');
-    // await page.click('input[name="app_code2[update_settings]"]');
-
-    // // Wait for the playlist title input field to appear on the page
-    // await page.waitForSelector('input[id="app_code2_pluginInfo_playlist_title"]');
-    
-    // // Fill the playlist title input field letter by letter
-    // await page.type('input[id="app_code2_pluginInfo_playlist_title"]', playlistTitle);
-
-    // // Select the "Low" option from the network caching series dropdown
-    // await page.select('select[id="app_code2_pluginInfo_network_caching_series"]', '0');
-
-    // // Wait for half a second
-    // await page.waitForTimeout(500);
-
-    // // Click on the form submit button
-    // await page.click('#form_submit_button');
-    // await page.waitForTimeout(1000);
-
-    console.log('Finished!');
-
-    // Close the browser when finished
-    // await browser.close();
-    
-
-    res.status(200).json({ message: 'Script executed successfully' });
-  } catch (error) {
-    console.error('Captcha!');
-    res.status(500).json({ error: error.message });
-  }
+const patchCode = async (req, res) => {
+    const { name, number } = req.body
+    await Code.findByIdAndUpdate(id, {
+        name,
+        number
+    })
+    res.status(200).send(`Se actualizo el código con éxito.`)
 };
 
-module.exports = { cargarCodigo };
+const renewCode = async (req, res) => {
+    const { id, codigo } = req.body
+    await renovarPostData(codigo)
+    const date = new Date();
+    const expire = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    const status = 'activo'
+    await Code.findByIdAndUpdate(id, {
+        expire: expire.toLocaleDateString('es-ES'),
+        status
+    })
+    res.status(200).send(`Se renovó el código con éxito.`)
+};
 
+const renewDateCode = async (req, res) => {
+    const { id } = req.body
+    const date = new Date();
+    const expire = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    await Code.findByIdAndUpdate(id, {
+        expire: expire.toLocaleDateString('es-ES'),
+    })
+    res.status(200).send(`Se renovó el código con éxito.`)
+};
 
-// lineid = 5024
-// codeValue = 66617011
+const banCode = async (req, res) => {
+    const {idXeev, id} = req.body
+    const status = 'desactivado'
+    await Code.findByIdAndUpdate(id, {
+        status
+    })
+    res.status(200).send(`Se desactivo el código con éxito.`)
+};
 
-// 66617011
-// C3AB54BB
-// FCF5643C
-// 07CD4E2C
-// 166464D0
+const deleteCode = async (req, res) => {
+    const {idXeev} = req.body
+    const data = {
+        action: 'remove_code',
+        ids: [idXeev]
+      };
+      
+      const headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'Origin': 'https://xeev.net',
+        'Referer': 'https://xeev.net/en/app/dev_x3m',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'Cookie': 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
+      };
+      
+      const options = {
+        method: 'POST',
+        url: 'https://xeev.net/en/user/api',
+        headers: headers,
+        data: data
+      };
+     
+    try{
+      axios(options)
+        .then(response => {
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+        res.status(200).json('Exito');
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+        
+}
 
-// 09AJBLKW2DW4qZVZv_IIBK7iV_-iZfXik7qUHyoa-FS5Blq_5j32LLFwk_bGxr3jY16XA-OLOTcQm9jD865xOrJGmzp0CLXY2GF84
+const postData = async (req, res) => {
+    const {codigo, name, number, seller } = req.body
+    const code = codigo
+    try {
+    const data = {
+      action: 'add_appcode',
+      type: 'line',
+      id: '792431',
+      code: 'B50F6E55'
+    };
+    const headers = {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Origin: 'https://xeev.net',
+      Referer: 'https://xeev.net/en/app/lines/edit/792431',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'same-origin',
+      Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
+    };
+    const options = {
+      headers: headers
+    };
+      const response = await axios.post('https://xeev.net/en/user/api', data, options);
+      const idXeev = response.data.data[0].id
+      await generarEditData(codigo)
+      await crearCode(idXeev, code, name, number, seller)
+        res.status(200).json(response.data);
+    } catch (error) {
+    res.status(500).json({ error: error.message });
+  };
+}
 
+const renovarPostData = async ( codigo ) => {
+    const data = {
+        action: 'add_appcode',
+        type: 'line',
+        id: '792431',
+        code: codigo
+    };
+    const headers = {
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        Origin: 'https://xeev.net',
+        Referer: 'https://xeev.net/en/app/lines/edit/792431',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
+    };
+    const options = {
+        headers: headers,
+    };
+    try {
+        const response = await axios.post('https://xeev.net/en/user/api', data, options);
+        await generarEditData(codigo)
+        console.log('Exito');
+    } catch (error) {
+        console.log(error.message);
+    }
+};
 
-// 09AJBLKW3kVIUU4SSOxEDuP_MjaufRx2M-Vk2NeShgem7nfAFQJNTW7LkN3o_RlzPQR0e1aiXJ8En6Zirt8BABCcofD0CJCN6v4CU
+const generarEditData = async (codigo) => {
+    const headers = {
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        Origin: 'https://xeev.net',
+        Referer: 'https://xeev.net/en/app/lines/edit/792431',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57',
+        'content-length': '0'
+    };
+    const options = {
+        headers: headers,
+    };
+    try {
+        const response = await axios.post('https://xeev.net/en/user/form/edit_x3mcode', null, options);
+        const tokenValue = response.data.form.match(/app_code2\[_token\]"\s*value="([^"]*)/)[1];
+        editData(codigo, tokenValue)
 
-// 120,120,120
+    } catch (error) {
+        console.log(error.message);
+    }
+};
 
-// RECAPTCHA : 6Les5LsUAAAAAHETMg3GsVl0FllXMr366eCb66mK
+const editData = async (codigo, tokenValue) => {
+    const formData = new FormData();
+    formData.append('app_code2[ids]', codigo);
+    formData.append('app_code2[executer][message]', '');
+    formData.append('app_code2[executer][task]', '2');
+    formData.append('app_code2[update_settings]', '1');
+    formData.append('app_code2[pluginInfo][playlist_title]', 'XPLAY - Lider En Latinoamerica de Series y Peliculas');
+    formData.append('app_code2[pluginInfo][audio_offset]', '0');
+    formData.append('app_code2[pluginInfo][ovp_title]', '');
+    formData.append('app_code2[pluginInfo][openvpn_url]', '');
+    formData.append('app_code2[pluginInfo][openvpn_file]', '(binary)');
+    formData.append('app_code2[pluginInfo][openvpn_username]', '');
+    formData.append('app_code2[pluginInfo][openvpn_password]', '');
+    formData.append('app_code2[pluginInfo][epg_title]', '');
+    formData.append('app_code2[pluginInfo][additional_epg]', '');
+    formData.append('app_code2[pluginInfo][appearance]', '');
+    formData.append('app_code2[pluginInfo][show_homescreen]', '1');
+    formData.append('app_code2[pluginInfo][hide_channel_numbers]', '1');
+    formData.append('app_code2[pluginInfo][live_tv]', '');
+    formData.append('app_code2[pluginInfo][live_autostart]', '1');
+    formData.append('app_code2[pluginInfo][player_live]', '-1');
+    formData.append('app_code2[pluginInfo][network_caching_live]', '1');
+    formData.append('app_code2[pluginInfo][movies]', '');
+    formData.append('app_code2[pluginInfo][player_vod]', '-1');
+    formData.append('app_code2[pluginInfo][network_caching_vod]', '0');
+    formData.append('app_code2[pluginInfo][sorting_vod]', 'additional.added');
+    formData.append('app_code2[pluginInfo][series]', '');
+    formData.append('app_code2[pluginInfo][player_series]', '-1');
+    formData.append('app_code2[pluginInfo][network_caching_series]', '0');
+    formData.append('app_code2[pluginInfo][sorting_series]', 'additional.added');
+    formData.append('app_code2[pluginInfo][autoplay_next_episode]', '1');
+    formData.append('app_code2[pluginInfo][live_archive]', '');
+    formData.append('app_code2[pluginInfo][player_archive]', '-1');
+    formData.append('app_code2[pluginInfo][livetv_offset]', '0');
+    formData.append('app_code2[pluginInfo][recordings]', '');
+    formData.append('app_code2[pluginInfo][player_recording]', '-1');
+    formData.append('_token', tokenValue);
+    const headers = {
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+        Origin: 'https://xeev.net',
+        Referer: 'https://xeev.net/en/app/dev_x3m/edit/spe',
+        'Sec-Ch-Ua': '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"',
+        'Sec-Ch-Ua-Mobile': '?1',
+        'Sec-Ch-Ua-Platform': '"Android"',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
+    };
+    const options = {
+        headers: headers,
+    };
+    try {
+        await axios.post('https://xeev.net/en/user/form/edit_x3mcode', formData, options);
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+const keepAlive = async () => {
+    const data = {
+      action: 'get_x3m_dev',
+      page: 1,
+      limit: 50,
+      limit_entries: [10, 25, 50, 100, 500],
+      total_count: 1,
+      ordering: {
+        field: 'id',
+        direction: 'desc',
+      },
+      filter: 'B50F6E55',
+    };
+  
+    const headers = {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Origin: 'https://xeev.net',
+      Referer: 'https://xeev.net/en/app/lines/edit/792431',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'same-origin',
+      Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57',
+    };
+  
+    const options = {
+      headers: headers,
+    };
+  
+    try {
+      const response = await axios.post(
+        'https://xeev.net/en/user/api',
+        data,
+        options
+      );
+      console.log('Reavivado');
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  keepAlive();
+  setInterval(() => {
+    keepAlive();
+  }, 30 * 1000);
+
+module.exports = { postData, getCodes, getCodeEspecifico, borrarCodePermanente, patchCode, renewCode, banCode, renewDateCode, deleteCode };
