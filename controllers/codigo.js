@@ -324,11 +324,9 @@ const keepAlive = async () => {
     for (const code of codes) {
         const expireDate = new Date(code.expire.split('/').reverse().join('-')); // Convert DD/MM/YYYY to YYYY-MM-DD format
         if (now > expireDate) {
-            console.log('Vencido');
             await banCodeAutomatico(code._id);
             await deleteCodeAutomatico(code.idXeev);
         } else {
-          console.log('falta');
         }
     }
 }
