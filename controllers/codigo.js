@@ -52,8 +52,7 @@ const patchCode = async (req, res) => {
 };
 
 const renewCode = async (req, res) => {
-    const { id, codigo } = req.body
-    await renovarPostData(codigo)
+    const { id } = req.body
     const date = new Date();
     const expire = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate());
     const status = 'activo'
@@ -111,7 +110,7 @@ const deleteCode = async (req, res) => {
     try{
       axios(options)
         .then(response => {
-          console.log(response.data);
+          console.log('Bien');
         })
         .catch(error => {
           console.log(error);
@@ -120,7 +119,6 @@ const deleteCode = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-        
 }
 
 const postData = async (req, res) => {
@@ -131,7 +129,7 @@ const postData = async (req, res) => {
       action: 'add_appcode',
       type: 'line',
       id: '792431',
-      code: 'B50F6E55'
+      code: codigo
     };
     const headers = {
       Accept: 'application/json, text/plain, */*',
@@ -156,34 +154,35 @@ const postData = async (req, res) => {
   };
 }
 
-const renovarPostData = async ( codigo ) => {
+const renovarPostData = async (req, res) => {
+    const {codigo} = req.body
+    try {
     const data = {
-        action: 'add_appcode',
-        type: 'line',
-        id: '792431',
-        code: codigo
+      action: 'add_appcode',
+      type: 'line',
+      id: '792431',
+      code: codigo
     };
     const headers = {
-        Accept: 'application/json, text/plain, */*',
-        'Content-Type': 'application/json',
-        Origin: 'https://xeev.net',
-        Referer: 'https://xeev.net/en/app/lines/edit/792431',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-origin',
-        Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Origin: 'https://xeev.net',
+      Referer: 'https://xeev.net/en/app/lines/edit/792431',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'same-origin',
+      Cookie: 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
     };
     const options = {
-        headers: headers,
+      headers: headers
     };
-    try {
-        const response = await axios.post('https://xeev.net/en/user/api', data, options);
-        await generarEditData(codigo)
-        console.log('Exito');
+      const response = await axios.post('https://xeev.net/en/user/api', data, options);
+      await generarEditData(codigo)
+        res.status(200).json(response.data);
     } catch (error) {
-        console.log(error.message);
-    }
-};
+    res.status(500).json({ error: error.message });
+  };
+}
 
 const generarEditData = async (codigo) => {
     const headers = {
@@ -313,10 +312,68 @@ const keepAlive = async () => {
       console.log(error.message);
     }
   };
-  keepAlive();
 
   setInterval(() => {
     keepAlive();
-  }, 120 * 1000);
+    checkCodes();
+  }, 5 * 60 * 1000);
 
-module.exports = { postData, getCodes, getCodeEspecifico, borrarCodePermanente, patchCode, renewCode, banCode, renewDateCode, deleteCode };
+  const checkCodes = async () => {
+    const codes = await Code.find({})
+    const now = new Date();
+    for (const code of codes) {
+        const expireDate = new Date(code.expire.split('/').reverse().join('-')); // Convert DD/MM/YYYY to YYYY-MM-DD format
+        if (now > expireDate) {
+            console.log('Vencido');
+            await banCodeAutomatico(code._id);
+            await deleteCodeAutomatico(code.idXeev);
+        } else {
+          console.log('falta');
+        }
+    }
+}
+
+const banCodeAutomatico = async (id) => {
+  const status = 'desactivado'
+  await Code.findByIdAndUpdate(id, {
+      status
+  })
+};
+
+const deleteCodeAutomatico = async (idXeev) => {
+  const data = {
+      action: 'remove_code',
+      ids: [idXeev]
+    };
+    
+    const headers = {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      'Origin': 'https://xeev.net',
+      'Referer': 'https://xeev.net/en/app/dev_x3m',
+      'Sec-Fetch-Dest': 'empty',
+      'Sec-Fetch-Mode': 'cors',
+      'Sec-Fetch-Site': 'same-origin',
+      'Cookie': 'privacy_readed=true; PHPSESSID=4rb0qkl47k54mnmdpf2l5idn57'
+    };
+    
+    const options = {
+      method: 'POST',
+      url: 'https://xeev.net/en/user/api',
+      headers: headers,
+      data: data
+    };
+   
+  try{
+    axios(options)
+      .then(response => {
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    } catch (error) {
+      console.log(error.message);
+  }
+      
+}
+module.exports = { postData, getCodes, getCodeEspecifico, borrarCodePermanente, patchCode, renewCode, banCode, renewDateCode, deleteCode, renovarPostData };
