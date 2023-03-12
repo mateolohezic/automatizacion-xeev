@@ -313,6 +313,8 @@ const keepAlive = async () => {
     }
   };
 
+  keepAlive();
+
   setInterval(() => {
     keepAlive();
     checkCodes();
