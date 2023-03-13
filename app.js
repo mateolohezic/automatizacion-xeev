@@ -4,8 +4,12 @@ require('dotenv').config();
 const port = process.env.PORT;
 const cors = require('cors');
 app.use(express.json());
-app.use(cors());
 require('./database/db');
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+  });
 
 const codigo = require('./routes/codigo');
 const users = require('./routes/users');
