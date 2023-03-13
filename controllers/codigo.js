@@ -307,7 +307,7 @@ const keepAlive = async () => {
         data,
         options
       );
-      console.log(`Reavivado ${vecesReavivado}`);
+      console.log(`Revivido ${vecesReavivado}`);
     } catch (error) {
       console.log(error.message);
     }
