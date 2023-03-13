@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 require('dotenv').config();
 const claveToken = process.env.CLAVE;
-const bcrypt = require('bcrypt');
 
 const getUser = async (req, res) => {
     try {
@@ -25,14 +24,12 @@ const crearUser = async (req, res) => {
     const credits = 0;
     const date = new Date();
     const expire = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate());
-    const saltRound = 15; 
-    const passwordEncripted = bcrypt.hashSync(password, saltRound);
     const nuevoUser = new User({
         username,
         name,
         surname,
         email,
-        password: passwordEncripted,
+        password,
         credits,
         expire: expire.toLocaleDateString('es-ES'),
         role
@@ -105,7 +102,7 @@ const loginUser = async (req, res) => {
     try{
         const user = await User.findOne({"email": email})
         if (user) {
-            if (bcrypt.compareSync(password, user.password)) {
+            if (password === user.password) {
                 const token = jwt.sign({user}, claveToken , { expiresIn : "1h"})
                 res.status(200).json({user,token})
           
