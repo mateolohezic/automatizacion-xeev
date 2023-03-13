@@ -1,6 +1,6 @@
 const express = require('express');
 const route = express.Router();
-const { postData, getCodes, getCodeEspecifico, borrarCodePermanente, patchCode, renewCode, banCode, renewDateCode, deleteCode, renovarPostData } = require('../controllers/codigo');
+const { postData, getCodes, borrarCodePermanente, patchCode, renewCode, banCode, renewDateCode, deleteCode, renovarPostData } = require('../controllers/codigo');
 
 route.post('/cargar-codigo', postData)
 route.get('/get-codigo', getCodes)
